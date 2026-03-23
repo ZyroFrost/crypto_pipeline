@@ -1,0 +1,27 @@
+# docker-compose.yml: Build DockerFile first before running docker-compose up
+
+# This file defines the services for the Airflow application using Docker Compose.
+# Create a Docker image named 'crypto-airflow' using the Dockerfile in the current directory.
+# The Airflow service will mount the local 'airflow/dags' directory to the container's '/opt/airflow/dags' directory.
+# The Airflow service will listen on port 8080 and run in standalone mode.
+version: '3'
+
+services:
+  crypto-airflow: # Service name for the Airflow application
+    build: . # Build the Docker image using the Dockerfile in the current directory (from folder)
+    image: crypto-airflow:latest # Build image name in Dockerfile
+    env_file: # Load environment variables from .env file
+      - .env
+    
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags # Mount local DAGs directory to container
+      - ./data:/opt/airflow/data # Mount local DATA directory to container
+      # ./airflow/dags (outside container, local pc) -> /opt/airflow/dags (inside container)
+
+    ports:
+      - "8080:8080" # Check port: netstat -ano | findstr :8080 (if LISTENING, port is in use, if nothing shows, port is free)
+    command: airflow standalone
+
+# To check file: dirX
+# To run the application, use the command: docker-compose up / docker-compose up -d (to run in detached mode, chạy ngầm ko chiếm terminal)
+# To stop the application, use the command: docker-compose down

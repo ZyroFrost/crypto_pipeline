@@ -1,0 +1,14 @@
+# Check username: 
+- Compute Engine → VM Instances → bấm vào SSH (trên web) -> ra terminal zyrofrost@crypto-pipeline
+
+# Kết nối từ VSCode vào Googlecloud
+- Cài SSH (remote VM)
+- Ctrl + Shift + P
+- Select Remote: Connect to Host
+- Nhập ssh zyrofrost@136.115.8.116 -A
+- Chọn nơi lưu cấu hình C:\Users\Zyro\.ssh\config
+
+# # Cài Docker trên VM (qua SSH):
+- Chạy SSH ở giao diện web (ra SSH in browser) -> gcloud compute ssh crypto-pipeline
+- sudo apt install docker.io docker-compose -y 
+- sudo usermod -aG docker $USER (cho phép user chạy docker (không cần sudo) -> newgrp docker

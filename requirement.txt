@@ -1,2 +1,5 @@
-pip install requests
-pip install apache-airflow
+requests
+apache-airflow
+
+# pip install requests
+# pip install apache-airflow

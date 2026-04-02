@@ -12,6 +12,9 @@ services:
     image: crypto-airflow:latest # Build image name in Dockerfile
     env_file: # Load environment variables from .env file
       - .env
+    environment:
+      - _AIRFLOW_WWW_USER_USERNAME=admin
+      - _AIRFLOW_WWW_USER_PASSWORD=admin
     
     volumes:
       - ./airflow/dags:/opt/airflow/dags # Mount local DAGs directory to container

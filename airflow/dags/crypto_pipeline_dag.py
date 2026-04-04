@@ -55,7 +55,7 @@ default_args = {
 with DAG(
     dag_id="crypto_pipeline", # tên DAG (hiện trên UI)
     start_date=datetime(2024, 1, 1), # mốc bắt đầu
-    schedule_interval="*/10 * * * *", # chạy mỗi 10 phút
+    schedule_interval="*/60 * * * *", # chạy mỗi 60 phút
     catchup=False, # không chạy lại quá khứ
 ) as dag:
 

@@ -1,0 +1,5 @@
+requests
+apache-airflow-providers-google
+
+# pip install requests
+# pip install apache-airflow-providers-google

@@ -1,5 +1,9 @@
 # Crypto Data Pipeline (End-to-End ETL)
 
+> 🚀 **Live Web UI / Demo:** [http://crypto-data-pipeline.duckdns.org/](http://crypto-data-pipeline.duckdns.org/)
+> 
+> 🔑 **Guest Account (Read-only):** `account: guest` / `password: guest`
+
 ## Overview
 This project is an automated ETL pipeline for cryptocurrency data. It extracts data from APIs, processes it locally on a Cloud Virtual Machine (VM) using Apache Airflow, and loads the structured data into a Google Cloud Storage (GCS) Data Lake. The pipeline is fully containerized using Docker and accessible via a custom DuckDNS domain.
 

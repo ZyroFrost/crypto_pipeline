@@ -45,10 +45,14 @@ This project is an automated ETL pipeline for cryptocurrency data. It extracts d
 
 **3. Create a Service Account & JSON Key**
 * **Purpose:** To provide a secure "ID card" for Airflow. This JSON key authenticates the `upload_to_gcs` task, allowing the VM to securely write data into the GCS Bucket without needing your personal Google login.
-* Go to **IAM & Admin** -> **Service Accounts** -> **Create Service Account**.
-* Grant it the **Storage Object Admin** or **Storage Object Creator** role.
-* Once created, click on it -> **Keys** tab -> **Add Key** -> **Create new key** -> **JSON**.
-* Save this `.json` file to your local computer.
+* **Step 1:** Go to **IAM & Admin** -> **Service Accounts** -> Click **+ CREATE SERVICE ACCOUNT**.
+* **Step 2:** Enter a name (e.g., `airflow-gcs-zyro`) and click **CREATE AND CONTINUE**.
+* **Step 3:** Under "Grant this service account access to project", search for and select the role: **Storage Object Admin**. Click **CONTINUE** and then **DONE**.
+* **Step 4:** In the Service Accounts list, click on the **Email** of the account you just created.
+* **Step 5:** Go to the **Keys** tab -> Click **ADD KEY** -> Select **Create new key**.
+* **Step 6:** Choose **JSON** as the key type and click **CREATE**.
+* **Step 7:** A `.json` file will automatically download to your computer. **This is your only copy of the key.**
+* **Step 8:** Move or copy the content of this file to `~/projects/crypto_pipeline/service-account.json` on your WSL/Ubuntu system.
   
 <img width="563" height="602" alt="image" src="https://github.com/user-attachments/assets/d4cdca79-0d3c-4923-b1d1-1ba937e40e70" />
 <br>
@@ -64,7 +68,6 @@ This project is an automated ETL pipeline for cryptocurrency data. It extracts d
 ```bash
 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 ```
-*(Press Enter to save to default location, leave passphrase empty if desired).*
 
 ---
 
@@ -87,6 +90,28 @@ Host Crypto-VM
 ```
 * Press `Ctrl+Shift+P` -> `Remote-SSH: Connect to Host` -> select `Crypto-VM`. You are now inside the VM.
 <br>
+
+**4. Set up BigQuery (Data Warehouse)**
+* **Purpose:** To create a structured database (Dataset) where your processed crypto/stock data will be stored, allowing you to run SQL queries for analysis.
+* **1: Create Dataset:**
+    * Go to **BigQuery** in the Google Cloud Console.
+    * In the **Explorer** panel, click the three vertical dots next to your **Project ID** and select **Create dataset**.
+    * **Dataset ID:** Enter a name (e.g., `crypto_market_data`).
+    * **Location type:** Select **Region** and choose **us-central1 (Iowa)**. 
+      *(Note: This MUST match your GCS Bucket location to stay in the Free Tier and avoid data transfer costs).*
+    * Click **CREATE DATASET**.
+* **2: Update Service Account Roles:**
+    * Go to **IAM & Admin** -> **IAM**.
+    * Find your existing Service Account (the one created in step 3) and click the **Edit** (pencil) icon.
+    * Click **ADD ANOTHER ROLE** and search for: **BigQuery Admin**.
+    * *(Note: This gives Airflow permission to create tables and load data into BigQuery).*
+    * Click **SAVE**.
+* **3: Enable BigQuery API:**
+    * Go to **APIs & Services** -> **Library**.
+    * Search for **BigQuery API**.
+    * Ensure it is **Enabled** (usually enabled by default, but worth checking).
+* **4: Table Schema (Optional for now):**
+    * You don't need to create tables manually; the Airflow DAG will automatically create them using the `GoogleCloudStorageToBigQueryOperator` when it runs for the first time.
 
 ---
 ---

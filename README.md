@@ -91,6 +91,8 @@ Host Crypto-VM
 * Press `Ctrl+Shift+P` -> `Remote-SSH: Connect to Host` -> select `Crypto-VM`. You are now inside the VM.
 <br>
 
+---
+
 **4. Set up BigQuery (Data Warehouse)**
 * **Purpose:** To create a structured database (Dataset) where your processed crypto/stock data will be stored, allowing you to run SQL queries for analysis.
 * **1: Create Dataset:**

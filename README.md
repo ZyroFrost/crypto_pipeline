@@ -1,9 +1,5 @@
 # Crypto Data Pipeline (End-to-End ETL)
 
-> 🚀 **Live Web UI / Demo:** [http://crypto-data-pipeline.duckdns.org/](http://crypto-data-pipeline.duckdns.org/)
-> 
-> 🔑 **Guest Account (Read-only):** `account: guest` / `password: guest`
-
 ## Overview
 This project is an automated ETL pipeline for cryptocurrency data. It extracts data from APIs, processes it locally on a Cloud Virtual Machine (VM) using Apache Airflow, and loads the structured data into a Google Cloud Storage (GCS) Data Lake. The pipeline is fully containerized using Docker and accessible via a custom DuckDNS domain.
 
@@ -12,7 +8,6 @@ This project is an automated ETL pipeline for cryptocurrency data. It extracts d
 * **Storage:** Google Cloud Storage (GCS) with Hive Partitioning.
 * **Orchestration:** Apache Airflow (LocalExecutor) running on Docker.
 * **Database:** PostgreSQL (Airflow Metadata).
-* **Networking:** DuckDNS (Free Dynamic DNS).
 * **Development:** VS Code (Remote-SSH).
 
 ---
@@ -44,17 +39,23 @@ This project is an automated ETL pipeline for cryptocurrency data. It extracts d
 ---
 
 **3. Create a Service Account & JSON Key**
-* **Purpose:** To provide a secure "ID card" for Airflow. This JSON key authenticates the `upload_to_gcs` task, allowing the VM to securely write data into the GCS Bucket without needing your personal Google login.
+* **Purpose:** To provide a secure "ID card" for Airflow. This JSON key authenticates your local WSL2 system, allowing it to securely write data to GCP without needing your personal Google login.
 * **Step 1:** Go to **IAM & Admin** -> **Service Accounts** -> Click **+ CREATE SERVICE ACCOUNT**.
-* **Step 2:** Enter a name (e.g., `airflow-gcs-zyro`) and click **CREATE AND CONTINUE**.
-* **Step 3:** Under "Grant this service account access to project", search for and select the role: **Storage Object Admin**. Click **CONTINUE** and then **DONE**.
+* **Step 2:** Enter a name (e.g., `airflow-gcp-zyro`) and click **CREATE AND CONTINUE**.
+* **Step 3:** Under "Grant this service account access to project", assign roles based on your deployment strategy:
+  * 🚀 **For Quick Testing (Current Setup):** Select **Storage Object Admin** and **BigQuery Admin**. 
+    *(Note: This grants full control to bypass permission errors during local development, but is strictly for testing).*
+  * 🛡️ **For Production (Best Practice):** Apply the *Principle of Least Privilege* by assigning exactly what the pipeline needs to operate safely: 
+    **Storage Object Creator** (to write files to GCS), **BigQuery Data Editor** (to insert data into tables), and **BigQuery Job User** (to execute the load jobs).
+  * Choose your preferred roles, click **CONTINUE**, and then **DONE**.
 * **Step 4:** In the Service Accounts list, click on the **Email** of the account you just created.
 * **Step 5:** Go to the **Keys** tab -> Click **ADD KEY** -> Select **Create new key**.
 * **Step 6:** Choose **JSON** as the key type and click **CREATE**.
 * **Step 7:** A `.json` file will automatically download to your computer. **This is your only copy of the key.**
 * **Step 8:** Move or copy the content of this file to `~/projects/crypto_pipeline/service-account.json` on your WSL/Ubuntu system.
   
-<img width="563" height="602" alt="image" src="https://github.com/user-attachments/assets/d4cdca79-0d3c-4923-b1d1-1ba937e40e70" />
+<img width="577" height="453" alt="Screenshot 2026-04-11 010513" src="https://github.com/user-attachments/assets/d9a9d463-6010-42e0-8dc0-3c2bdacab411" />
+
 <br>
 
 ---
@@ -118,41 +119,7 @@ Host Crypto-VM
 ---
 ---
 
-### Phase 3: Domain Setup (DuckDNS)
-
-**🚦 Choose your setup path:**
-* **👉 For Local Development:** Skip this entire phase. You can access Airflow directly via `http://localhost:8080`.
-* **👉 For Cloud Deployment (VM):** Follow the steps below to map your VM's public IP to a free Domain, making it easier to access and preventing issues when the VM restarts.
-
-**1. Register Domain**
-* **Purpose:** To provide a static, easy-to-remember web address (like `my-pipeline.duckdns.org`) instead of memorizing a raw IP address.
-* Go to [DuckDNS.org](https://www.duckdns.org/) and log in.
-* In the "domains" section, type a name and click **add domain**.
-* Copy your **token** (a long string of characters at the top of the page).
-
----
-
-**2. Automate IP Update via Cron Job**
-* **Purpose:** Cloud VMs change their IP addresses if restarted. By adding a direct command to the VM's cron table, it will run in the background every 5 minutes to automatically update DuckDNS with your latest IP.
-* Open your VM terminal in VS Code and open the crontab editor:
-```bash
-crontab -e
-```
-*(If prompted to choose an editor, press `1` for nano).*
-* Scroll to the very bottom of the file and paste this exact line (Replace `<YOUR_DOMAIN>` and `<YOUR_TOKEN>` with your details):
-```text
-*/5 * * * * curl -k "[https://www.duckdns.org/update?domains=](https://www.duckdns.org/update?domains=)<YOUR_DOMAIN>&token=<YOUR_TOKEN>&ip="
-```
-* Save the file by pressing `Ctrl + O` -> `Enter` *(you should see a "lines written" message)*. Then exit by pressing `Ctrl + X`.
-* **Verify your setup:**
-  * Check if the cron job saved correctly: `crontab -l`
-  * Check your current VM IP: `curl ifconfig.me`
-<br>
-
----
----
-
-### Phase 4: VM Environment & Project Setup
+### Phase 3: VM Environment & Project Setup
 Open the VS Code integrated terminal (you are now operating on the VM).
 
 **1. Install Docker & Docker Compose**
@@ -184,7 +151,7 @@ cd crypto_pipeline
 ---
 ---
 
-### Phase 5: Airflow Deployment
+### Phase 4: Airflow Deployment
 
 **1. Set Directory Permissions**
 * **Purpose:** Docker containers for Airflow run under user ID `50000`. This command grants that specific user permission to read the DAGs and write temporary data to the local disk.

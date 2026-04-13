@@ -1,5 +1,9 @@
 # Crypto Data Pipeline (End-to-End ETL)
 
+> 🚀 **Live Web UI / Demo:** [http://crypto-data-pipeline.duckdns.org/](http://crypto-data-pipeline.duckdns.org/)
+> 
+> 🔑 **Guest Account (Read-only):** `account: guest` / `password: guest`
+
 ## Overview
 This project is an automated ETL pipeline for cryptocurrency data. It extracts data from APIs, processes it locally on a Cloud Virtual Machine (VM) using Apache Airflow, and loads the structured data into a Google Cloud Storage (GCS) Data Lake. The pipeline is fully containerized using Docker and accessible via a custom DuckDNS domain.
 
@@ -7,6 +11,7 @@ This project is an automated ETL pipeline for cryptocurrency data. It extracts d
 * **Cloud Provider:** Google Cloud Platform (Compute Engine VM).
 * **Storage:** Google Cloud Storage (GCS) with Hive Partitioning.
 * **Orchestration:** Apache Airflow (LocalExecutor) running on Docker.
+* **Networking:** DuckDNS (Free Dynamic DNS).
 * **Database:** PostgreSQL (Airflow Metadata).
 * **Development:** VS Code (Remote-SSH).
 
@@ -55,6 +60,10 @@ This project is an automated ETL pipeline for cryptocurrency data. It extracts d
 * **Step 8:** Move or copy the content of this file to `~/projects/crypto_pipeline/service-account.json` on your WSL/Ubuntu system.
   
 <img width="577" height="453" alt="Screenshot 2026-04-11 010513" src="https://github.com/user-attachments/assets/d9a9d463-6010-42e0-8dc0-3c2bdacab411" />
+
+**4. Automate IP Update (Optional - for remote lab access)**
+* Run `crontab -e` and add: 
+  `*/5 * * * * curl -k "https://www.duckdns.org/update?domains=<YOUR_DOMAIN>&token=<YOUR_TOKEN>&ip="`
 
 <br>
 
